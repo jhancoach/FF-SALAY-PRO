@@ -15,7 +15,10 @@ import {
   Instagram, 
   Medal,
   Play,
-  Home
+  Home,
+  Trash2,
+  Plus,
+  X
 } from 'lucide-react';
 import { PlayerProfile, Role, CompetitionType, Tier, DynamicEntry, RecentCompetition } from './types';
 import { PREDEFINED_COMPETITIONS, calculateScore } from './services/calculator';
@@ -113,6 +116,12 @@ export default function App() {
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<PlayerProfile>(initialProfile);
   const [showFullReport, setShowFullReport] = useState(false);
+  
+  // Custom Competition State
+  const [customName, setCustomName] = useState('');
+  const [customType, setCustomType] = useState<CompetitionType>(CompetitionType.ONLINE);
+  const [customTier, setCustomTier] = useState<Tier>(Tier.B);
+  const [isAddingCustom, setIsAddingCustom] = useState(false);
 
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -147,6 +156,25 @@ export default function App() {
       newList = [...profile.selectedCompetitions, comp];
     }
     updateProfile('selectedCompetitions', newList);
+  };
+
+  const handleAddCustom = () => {
+    if (!customName.trim()) return;
+    const newComp = {
+      id: `custom-${Date.now()}`,
+      name: customName,
+      type: customType,
+      tier: customTier
+    };
+    updateProfile('selectedCompetitions', [...profile.selectedCompetitions, newComp]);
+    setCustomName('');
+    setCustomType(CompetitionType.ONLINE);
+    setCustomTier(Tier.B);
+    setIsAddingCustom(false);
+  };
+
+  const removeCustomCompetition = (id: string) => {
+     updateProfile('selectedCompetitions', profile.selectedCompetitions.filter(c => c.id !== id));
   };
 
   const handlePrint = () => {
@@ -598,9 +626,69 @@ export default function App() {
                 })}
               </div>
               
-              {/* Simple Add Custom (Visual Only for this demo scope, but functional logic present) */}
-              <div className="p-4 border border-dashed border-slate-700 rounded text-center text-slate-500 text-sm hover:border-yellow-500 hover:text-yellow-500 cursor-pointer transition-colors">
-                + Adicionar Campeonato Customizado (Simulado)
+              <div className="mt-6 border-t border-slate-800 pt-6">
+                  {/* List of added custom competitions */}
+                  {profile.selectedCompetitions.filter(c => c.id.startsWith('custom-')).length > 0 && (
+                     <div className="mb-4">
+                        <h4 className="text-xs font-display font-bold text-orange-300 mb-3 uppercase tracking-wider">Customizadas Adicionadas</h4>
+                        {profile.selectedCompetitions.filter(c => c.id.startsWith('custom-')).map(comp => (
+                           <div key={comp.id} className="flex justify-between items-center p-3 bg-slate-900/50 border border-slate-700 rounded mb-2 animate-fade-in">
+                              <div>
+                                 <span className="text-white font-bold block">{comp.name}</span>
+                                 <span className="text-xs text-slate-500">{comp.type} - Tier {comp.tier}</span>
+                              </div>
+                              <button onClick={() => removeCustomCompetition(comp.id)} className="text-red-500 hover:text-red-400 p-2 hover:bg-slate-800 rounded transition-colors">
+                                 <Trash2 size={16} />
+                              </button>
+                           </div>
+                        ))}
+                     </div>
+                  )}
+
+                  {/* Form */}
+                  {isAddingCustom ? (
+                     <div className="bg-slate-900 p-4 rounded border border-orange-500/30 animate-fade-in shadow-[0_0_20px_rgba(249,115,22,0.1)]">
+                        <div className="flex justify-between items-center mb-3">
+                           <span className="text-sm font-bold text-white">Nova Competição</span>
+                           <button onClick={() => setIsAddingCustom(false)} className="text-slate-500 hover:text-white"><X size={16}/></button>
+                        </div>
+                        <div className="space-y-3">
+                           <input 
+                             value={customName}
+                             onChange={e => setCustomName(e.target.value)}
+                             placeholder="Nome do Campeonato"
+                             className="w-full bg-slate-950 border border-slate-800 rounded px-3 py-2 text-sm text-white focus:border-orange-500 outline-none"
+                           />
+                           <div className="flex gap-2">
+                              <select 
+                                value={customType} 
+                                onChange={e => setCustomType(e.target.value as CompetitionType)} 
+                                className="bg-slate-950 border border-slate-800 rounded px-2 py-2 text-sm text-white flex-1 focus:border-orange-500 outline-none"
+                              >
+                                 <option value={CompetitionType.ONLINE}>ONLINE</option>
+                                 <option value={CompetitionType.PRESENCIAL}>PRESENCIAL</option>
+                              </select>
+                              <select 
+                                value={customTier} 
+                                onChange={e => setCustomTier(e.target.value as Tier)} 
+                                className="bg-slate-950 border border-slate-800 rounded px-2 py-2 text-sm text-white flex-1 focus:border-orange-500 outline-none"
+                              >
+                                 <option value={Tier.S}>TIER S</option>
+                                 <option value={Tier.A}>TIER A</option>
+                                 <option value={Tier.B}>TIER B</option>
+                                 <option value={Tier.C}>TIER C</option>
+                              </select>
+                           </div>
+                           <button onClick={handleAddCustom} className="w-full mt-2 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-sm font-bold rounded flex items-center justify-center shadow-lg">
+                              <Plus size={16} className="mr-2"/> Adicionar à Lista
+                           </button>
+                        </div>
+                     </div>
+                  ) : (
+                     <button onClick={() => setIsAddingCustom(true)} className="w-full py-3 border border-dashed border-slate-700 text-slate-500 hover:border-orange-500 hover:text-orange-500 transition-colors rounded flex items-center justify-center text-sm font-bold uppercase tracking-wide">
+                        <Plus size={16} className="mr-2"/> Adicionar Campeonato Customizado
+                     </button>
+                  )}
               </div>
             </div>
           )}
