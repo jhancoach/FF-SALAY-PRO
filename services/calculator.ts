@@ -66,10 +66,29 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
     competitionScore += val;
   });
 
-  // Titles
+  // Titles - Updated logic based on Tier/Type
   profile.titles.forEach(t => {
-     // Simplifying: 3 points per title
-     competitionScore += (t.count * 3);
+     // Find competition info
+     let comp = profile.selectedCompetitions.find(c => c.name === t.name);
+     if (!comp) {
+        comp = PREDEFINED_COMPETITIONS.find(c => c.name === t.name);
+     }
+
+     let val = 0;
+     if (comp) {
+        // Higher base value for Titles than Participation
+        if (comp.tier === Tier.S) val = 5;
+        else if (comp.tier === Tier.A) val = 3;
+        else if (comp.tier === Tier.B) val = 2;
+        else val = 1;
+
+        if (comp.type === CompetitionType.PRESENCIAL) val *= 1.5;
+     } else {
+        // Fallback default
+        val = 2;
+     }
+     
+     competitionScore += (t.count * val);
   });
 
   // Cap competition score

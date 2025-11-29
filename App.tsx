@@ -18,7 +18,9 @@ import {
   Home,
   Trash2,
   Plus,
-  X
+  X,
+  Info,
+  ArrowLeft
 } from 'lucide-react';
 import { PlayerProfile, Role, CompetitionType, Tier, DynamicEntry, RecentCompetition } from './types';
 import { PREDEFINED_COMPETITIONS, calculateScore } from './services/calculator';
@@ -113,6 +115,7 @@ const NeonSelect = ({ label, value, onChange, options, tooltip = "" }: any) => (
 
 export default function App() {
   const [started, setStarted] = useState(false);
+  const [showHelp, setShowHelp] = useState(false);
   const [step, setStep] = useState(0);
   const [profile, setProfile] = useState<PlayerProfile>(initialProfile);
   const [showFullReport, setShowFullReport] = useState(false);
@@ -202,7 +205,123 @@ export default function App() {
     }
   };
 
+  // Helper to get all competitions (predefined + custom)
+  const getAvailableCompetitions = () => {
+     const customComps = profile.selectedCompetitions.filter(c => c.id.startsWith('custom-'));
+     return [...PREDEFINED_COMPETITIONS, ...customComps];
+  };
+
   // --- RENDER STEPS ---
+  
+  // HELP / METHODOLOGY PAGE
+  if (showHelp) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-slate-200 p-8 neon-grid flex flex-col items-center">
+        <div className="max-w-4xl w-full">
+            <button onClick={() => setShowHelp(false)} className="mb-8 flex items-center text-yellow-500 hover:text-yellow-300 transition-colors font-bold uppercase tracking-wider">
+                <ArrowLeft className="mr-2" /> Voltar
+            </button>
+            
+            <div className="glass-panel p-8 rounded-xl border border-blue-500/30 shadow-[0_0_50px_rgba(59,130,246,0.15)] animate-fade-in">
+                <div className="text-center mb-10">
+                    <h1 className="text-4xl font-display font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500 mb-2">Metodologia de Avaliação</h1>
+                    <p className="text-slate-400">Entenda como o FF Salary Pro calcula o valor de mercado.</p>
+                </div>
+
+                {/* Section 1: Tiers & Salary */}
+                <div className="mb-12">
+                    <h2 className="text-xl font-display text-white mb-4 flex items-center border-l-4 border-yellow-500 pl-3">
+                        <Zap className="w-5 h-5 text-yellow-500 mr-2"/>
+                        Tiers e Faixas Salariais
+                    </h2>
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-sm text-left">
+                            <thead className="bg-slate-900 text-slate-400 uppercase font-display text-xs">
+                                <tr>
+                                    <th className="px-4 py-3 rounded-tl-lg">Tier</th>
+                                    <th className="px-4 py-3">Score Necessário</th>
+                                    <th className="px-4 py-3 rounded-tr-lg">Estimativa Salarial</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-800">
+                                <tr className="bg-yellow-900/10"><td className="px-4 py-3 font-bold text-yellow-400">TIER S</td><td className="px-4 py-3">80 - 100 pts</td><td className="px-4 py-3 text-yellow-200">R$ 8.000 - R$ 20.000+</td></tr>
+                                <tr className="bg-slate-900/30"><td className="px-4 py-3 font-bold text-white">TIER A</td><td className="px-4 py-3">60 - 79 pts</td><td className="px-4 py-3 text-slate-300">R$ 5.000 - R$ 7.999</td></tr>
+                                <tr className="bg-slate-900/30"><td className="px-4 py-3 font-bold text-white">TIER B</td><td className="px-4 py-3">40 - 59 pts</td><td className="px-4 py-3 text-slate-300">R$ 3.000 - R$ 4.999</td></tr>
+                                <tr className="bg-slate-900/30"><td className="px-4 py-3 font-bold text-white">TIER C</td><td className="px-4 py-3">20 - 39 pts</td><td className="px-4 py-3 text-slate-300">R$ 1.500 - R$ 2.999</td></tr>
+                                <tr className="bg-slate-900/30"><td className="px-4 py-3 font-bold text-slate-500">TIER D</td><td className="px-4 py-3">0 - 19 pts</td><td className="px-4 py-3 text-slate-500">Até R$ 1.499</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                     {/* Section 2: Roles */}
+                     <div>
+                        <h2 className="text-xl font-display text-white mb-4 flex items-center border-l-4 border-orange-500 pl-3">
+                            <Target className="w-5 h-5 text-orange-500 mr-2"/>
+                            Pesos por Função
+                        </h2>
+                        <ul className="space-y-2 text-sm text-slate-300">
+                            <li className="flex justify-between p-2 bg-slate-900/50 rounded"><span>Rush 1</span> <span className="text-orange-400 font-bold">12 pts</span></li>
+                            <li className="flex justify-between p-2 bg-slate-900/50 rounded"><span>Rush 2</span> <span className="text-orange-400 font-bold">11 pts</span></li>
+                            <li className="flex justify-between p-2 bg-slate-900/50 rounded"><span>Flex</span> <span className="text-orange-400 font-bold">10 pts</span></li>
+                            <li className="flex justify-between p-2 bg-slate-900/50 rounded"><span>Sniper / Granadeiro</span> <span className="text-orange-400 font-bold">9 pts</span></li>
+                            <li className="flex justify-between p-2 bg-yellow-900/20 border border-yellow-500/20 rounded mt-2"><span>Bônus Capitão</span> <span className="text-yellow-400 font-bold">+5 pts</span></li>
+                        </ul>
+                     </div>
+
+                     {/* Section 3: Performance & Social */}
+                     <div>
+                        <h2 className="text-xl font-display text-white mb-4 flex items-center border-l-4 border-pink-500 pl-3">
+                            <BarChart3 className="w-5 h-5 text-pink-500 mr-2"/>
+                            Métricas & Social
+                        </h2>
+                        <div className="space-y-4 text-sm text-slate-300">
+                            <div>
+                                <p className="font-bold text-white mb-1">Performance (Max 20 pts)</p>
+                                <p className="text-xs text-slate-400">Baseado em Kills Totais (ref: 1000 kills) e Booyahs recentes (para capitães).</p>
+                            </div>
+                            <div>
+                                <p className="font-bold text-white mb-1">Influência (Max 15 pts)</p>
+                                <p className="text-xs text-slate-400">Escala logarítmica de seguidores (Instagram) + Taxa de engajamento.</p>
+                            </div>
+                        </div>
+                     </div>
+                </div>
+                
+                {/* Section 4: Competitions */}
+                 <div className="mt-8">
+                    <h2 className="text-xl font-display text-white mb-4 flex items-center border-l-4 border-green-500 pl-3">
+                        <Trophy className="w-5 h-5 text-green-500 mr-2"/>
+                        Competições (Max 30 pts)
+                    </h2>
+                     <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="bg-slate-900/50 p-3 rounded">
+                            <span className="block text-slate-400 text-xs uppercase">Tier S (Mundial/Elite)</span>
+                            <span className="text-green-400 font-bold">4 pts</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-3 rounded">
+                            <span className="block text-slate-400 text-xs uppercase">Tier A (Nacional Oficial)</span>
+                            <span className="text-green-400 font-bold">3 pts</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-3 rounded">
+                            <span className="block text-slate-400 text-xs uppercase">Tier B (Comunidade Grande)</span>
+                            <span className="text-green-400 font-bold">2 pts</span>
+                        </div>
+                        <div className="bg-slate-900/50 p-3 rounded">
+                             <span className="block text-slate-400 text-xs uppercase">Multiplicador Presencial</span>
+                             <span className="text-yellow-400 font-bold">1.5x</span>
+                        </div>
+                     </div>
+                     <p className="mt-3 text-xs text-slate-500">* Títulos adicionam +3 pontos cada. Histórico recente e participações somam até +15 pts extras.</p>
+                </div>
+
+            </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   // 0. Intro / Landing
   if (!started) {
@@ -224,17 +343,29 @@ export default function App() {
             Plataforma avançada de análise de mercado para e-sports. Calcule o valor, tier e faixa salarial baseada em métricas de performance, influência e liderança.
           </p>
           
-          <button 
-            onClick={() => setStarted(true)}
-            className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-transparent font-display tracking-wider overflow-hidden rounded-lg focus:outline-none ring-offset-2 focus:ring-2 ring-yellow-400"
-          >
-            <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
-            <span className="relative flex items-center space-x-3">
-              <span className="uppercase text-yellow-100">Iniciar Cálculo</span>
-              <Play className="w-5 h-5 text-yellow-400 group-hover:translate-x-1 transition-transform" />
-            </span>
-            <div className="absolute inset-0 border-2 border-yellow-500/50 rounded-lg group-hover:border-yellow-400 group-hover:shadow-[0_0_20px_rgba(234,179,8,0.6)] transition-all"></div>
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <button 
+              onClick={() => setStarted(true)}
+              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-white transition-all duration-200 bg-transparent font-display tracking-wider overflow-hidden rounded-lg focus:outline-none ring-offset-2 focus:ring-2 ring-yellow-400"
+            >
+              <span className="absolute inset-0 w-full h-full -mt-1 rounded-lg opacity-30 bg-gradient-to-b from-transparent via-transparent to-gray-700"></span>
+              <span className="relative flex items-center space-x-3">
+                <span className="uppercase text-yellow-100">Iniciar Cálculo</span>
+                <Play className="w-5 h-5 text-yellow-400 group-hover:translate-x-1 transition-transform" />
+              </span>
+              <div className="absolute inset-0 border-2 border-yellow-500/50 rounded-lg group-hover:border-yellow-400 group-hover:shadow-[0_0_20px_rgba(234,179,8,0.6)] transition-all"></div>
+            </button>
+            
+            <button 
+              onClick={() => setShowHelp(true)}
+              className="group relative inline-flex items-center justify-center px-8 py-4 font-bold text-slate-300 hover:text-white transition-all duration-200 bg-transparent font-display tracking-wider overflow-hidden rounded-lg focus:outline-none border border-slate-700 hover:border-blue-500 hover:shadow-[0_0_15px_rgba(59,130,246,0.3)]"
+            >
+              <span className="relative flex items-center space-x-3">
+                <Info className="w-5 h-5 text-blue-400 group-hover:text-blue-300" />
+                <span className="uppercase text-sm">Como Funciona o Cálculo?</span>
+              </span>
+            </button>
+          </div>
         </div>
         
         <Footer />
@@ -726,8 +857,8 @@ export default function App() {
                          }}
                        >
                          <option value="" className="bg-slate-900">Selecione o Campeonato...</option>
-                         {PREDEFINED_COMPETITIONS.map(c => (
-                           <option key={c.id} value={c.name} className="bg-slate-900">{c.name} ({c.type})</option>
+                         {getAvailableCompetitions().map(c => (
+                           <option key={c.id} value={c.name} className="bg-slate-900">{c.name} ({c.type}) - {c.tier}</option>
                          ))}
                        </select>
                        <input 
@@ -775,8 +906,8 @@ export default function App() {
                          }}
                        >
                          <option value="" className="bg-slate-900">Selecione o Campeonato...</option>
-                         {PREDEFINED_COMPETITIONS.map(c => (
-                           <option key={c.id} value={c.name} className="bg-slate-900">{c.name} ({c.type})</option>
+                         {getAvailableCompetitions().map(c => (
+                           <option key={c.id} value={c.name} className="bg-slate-900">{c.name} ({c.type}) - {c.tier}</option>
                          ))}
                        </select>
                        <input 
@@ -820,7 +951,8 @@ export default function App() {
                                   if(!newList[i]) newList[i] = { id: Date.now().toString(), name: '', type: CompetitionType.ONLINE, position: 12 };
                                   newList[i].name = e.target.value;
                                   
-                                  const found = PREDEFINED_COMPETITIONS.find(c => c.name === e.target.value);
+                                  const all = getAvailableCompetitions();
+                                  const found = all.find(c => c.name === e.target.value);
                                   if (found) {
                                       newList[i].type = found.type;
                                   }
@@ -829,7 +961,7 @@ export default function App() {
                                }}
                             >
                                <option value="" className="bg-slate-900">Selecione a Competição...</option>
-                               {PREDEFINED_COMPETITIONS.map(c => (
+                               {getAvailableCompetitions().map(c => (
                                   <option key={c.id} value={c.name} className="bg-slate-900">{c.name} ({c.type})</option>
                                ))}
                             </select>
@@ -901,6 +1033,5 @@ export default function App() {
         </div>
         <Footer />
       </div>
-    </div>
-  );
-}
+    );
+  }
