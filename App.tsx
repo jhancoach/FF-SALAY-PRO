@@ -632,7 +632,20 @@ export default function App() {
             {step === 4 && "Histórico"}
             {step === 5 && "Recentes"}
           </h2>
-          <span className="text-orange-400 font-mono">STEP {step + 1} / {totalSteps}</span>
+          <div className="flex flex-col items-end">
+            <button 
+              onClick={() => {
+                if(window.confirm('Tem certeza que deseja limpar tudo e voltar ao início?')) {
+                  handleRestart();
+                }
+              }}
+              className="text-xs text-slate-600 hover:text-red-500 flex items-center mb-1 transition-colors uppercase tracking-widest"
+              title="Limpar e Reiniciar"
+            >
+              <Trash2 className="w-3 h-3 mr-1" /> Reset
+            </button>
+            <span className="text-orange-400 font-mono">STEP {step + 1} / {totalSteps}</span>
+          </div>
         </div>
         
         <StepIndicator current={step} total={totalSteps} />
