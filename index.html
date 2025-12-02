@@ -10,39 +10,147 @@
     <style>
       body {
         font-family: 'Rajdhani', sans-serif;
-        background-color: #050505;
+        background-color: #020617;
         color: #e2e8f0;
+        overflow-x: hidden;
       }
       h1, h2, h3, h4, h5, h6, .font-display {
         font-family: 'Orbitron', sans-serif;
       }
-      .neon-grid {
-        background-size: 50px 50px;
-        background-image: 
-          linear-gradient(to right, rgba(6, 182, 212, 0.05) 1px, transparent 1px),
-          linear-gradient(to bottom, rgba(168, 85, 247, 0.05) 1px, transparent 1px);
-        mask-image: linear-gradient(to bottom, black 40%, transparent 100%);
-      }
+      
+      /* Advanced Glassmorphism */
       .glass-panel {
-        background: rgba(15, 23, 42, 0.6);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 0 40px rgba(168, 85, 247, 0.1);
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
       }
-      /* Custom scrollbar */
-      ::-webkit-scrollbar {
-        width: 8px;
+
+      /* Neon Grid Background (Fallback) */
+      .neon-grid-bg {
+        background-size: 40px 40px;
+        background-image: 
+          linear-gradient(to right, rgba(234, 179, 8, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(234, 179, 8, 0.05) 1px, transparent 1px);
+        mask-image: radial-gradient(circle at center, black 40%, transparent 80%);
       }
-      ::-webkit-scrollbar-track {
-        background: #0f172a; 
+
+      /* Glitch Effect */
+      .glitch-text {
+        position: relative;
+        color: white;
       }
-      ::-webkit-scrollbar-thumb {
-        background: #334155; 
-        border-radius: 4px;
+      .glitch-text::before,
+      .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #020617;
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #475569; 
+      .glitch-text::before {
+        left: 2px;
+        text-shadow: -1px 0 #ff00c1;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim 5s infinite linear alternate-reverse;
       }
+      .glitch-text::after {
+        left: -2px;
+        text-shadow: -1px 0 #00fff9;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim2 5s infinite linear alternate-reverse;
+      }
+
+      @keyframes glitch-anim {
+        0% { clip: rect(14px, 9999px, 127px, 0); }
+        5% { clip: rect(34px, 9999px, 4px, 0); }
+        10% { clip: rect(89px, 9999px, 86px, 0); }
+        15% { clip: rect(4px, 9999px, 137px, 0); }
+        20% { clip: rect(44px, 9999px, 4px, 0); }
+        25% { clip: rect(6px, 9999px, 86px, 0); }
+        30% { clip: rect(74px, 9999px, 137px, 0); }
+        35% { clip: rect(104px, 9999px, 4px, 0); }
+        40% { clip: rect(3px, 9999px, 86px, 0); }
+        45% { clip: rect(54px, 9999px, 137px, 0); }
+        50% { clip: rect(14px, 9999px, 127px, 0); }
+        100% { clip: rect(14px, 9999px, 127px, 0); }
+      }
+      @keyframes glitch-anim2 {
+        0% { clip: rect(12px, 9999px, 12px, 0); }
+        5% { clip: rect(32px, 9999px, 2px, 0); }
+        10% { clip: rect(82px, 9999px, 82px, 0); }
+        15% { clip: rect(2px, 9999px, 132px, 0); }
+        20% { clip: rect(42px, 9999px, 2px, 0); }
+        25% { clip: rect(62px, 9999px, 82px, 0); }
+        30% { clip: rect(72px, 9999px, 132px, 0); }
+        35% { clip: rect(102px, 9999px, 2px, 0); }
+        40% { clip: rect(2px, 9999px, 82px, 0); }
+        45% { clip: rect(52px, 9999px, 132px, 0); }
+        50% { clip: rect(12px, 9999px, 12px, 0); }
+        100% { clip: rect(12px, 9999px, 12px, 0); }
+      }
+
+      /* Moving Gradient Background for Buttons */
+      .animate-gradient-xy {
+        background-size: 200% 200%;
+        animation: gradient-xy 6s ease infinite;
+      }
+      @keyframes gradient-xy {
+        0%, 100% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+      }
+
+      /* Floating Animation */
+      .animate-float {
+        animation: float 6s ease-in-out infinite;
+      }
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-20px); }
+        100% { transform: translateY(0px); }
+      }
+      
+      /* Animation Utilities */
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      .animate-fade-in {
+        animation: fade-in 0.8s ease-out forwards;
+      }
+      @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in-up {
+        animation: fade-in-up 0.8s ease-out forwards;
+      }
+
+      /* Scanline Effect */
+      .scanlines {
+        background: linear-gradient(
+          to bottom,
+          rgba(255,255,255,0),
+          rgba(255,255,255,0) 50%,
+          rgba(0,0,0,0.2) 50%,
+          rgba(0,0,0,0.2)
+        );
+        background-size: 100% 4px;
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: 9999;
+        pointer-events: none;
+        opacity: 0.15;
+      }
+
+      /* Scrollbar */
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #020617; }
+      ::-webkit-scrollbar-thumb { background: #334155; border-radius: 3px; }
+      ::-webkit-scrollbar-thumb:hover { background: #eab308; }
     </style>
   <script type="importmap">
 {
@@ -59,5 +167,6 @@
   <body class="overflow-x-hidden min-h-screen bg-slate-950">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    <div class="scanlines"></div>
   </body>
 </html>

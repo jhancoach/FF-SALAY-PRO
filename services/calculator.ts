@@ -51,7 +51,7 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
   // Engagement bonus
   socialScore += Math.min(5, (profile.engagement / 10) * 5);
 
-  // 4. Competitions & Titles (Max ~30 points)
+  // 4. Competitions & Titles (Max ~35 points) - Increased cap slightly
   let competitionScore = 0;
   
   // Base value for playing in tiers
@@ -66,7 +66,7 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
     competitionScore += val;
   });
 
-  // Titles - Updated logic based on Tier/Type
+  // Titles - Refined logic based on Tier/Type
   profile.titles.forEach(t => {
      // Find competition info
      let comp = profile.selectedCompetitions.find(c => c.name === t.name);
@@ -77,12 +77,13 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
      let val = 0;
      if (comp) {
         // Higher base value for Titles than Participation
-        if (comp.tier === Tier.S) val = 5;
-        else if (comp.tier === Tier.A) val = 3;
-        else if (comp.tier === Tier.B) val = 2;
-        else val = 1;
+        // Refined weights: More value for S and A tiers
+        if (comp.tier === Tier.S) val = 7;      // Refined: 7 pts for World Title
+        else if (comp.tier === Tier.A) val = 5; // Refined: 5 pts for National
+        else if (comp.tier === Tier.B) val = 3; // Refined: 3 pts for Community
+        else val = 1.5;
 
-        if (comp.type === CompetitionType.PRESENCIAL) val *= 1.5;
+        if (comp.type === CompetitionType.PRESENCIAL) val *= 1.2; // Small bonus for offline title
      } else {
         // Fallback default
         val = 2;
@@ -92,7 +93,7 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
   });
 
   // Cap competition score
-  competitionScore = Math.min(30, competitionScore);
+  competitionScore = Math.min(40, competitionScore); // Increased cap to 40 to allow legends to shine
 
   // 5. History / Participations / Last 3 (Max ~15 points)
   let historyScore = 0;
@@ -123,16 +124,16 @@ export function calculateScore(profile: PlayerProfile): CalculationResult {
   let tier = '';
   let salaryRange = '';
 
-  if (score >= 80) {
+  if (score >= 85) { // Increased threshold slightly for S Tier
     tier = 'TIER S';
-    salaryRange = 'R$ 8.000 - R$ 20.000';
-  } else if (score >= 60) {
+    salaryRange = 'R$ 8.000 - R$ 20.000+';
+  } else if (score >= 65) {
     tier = 'TIER A';
     salaryRange = 'R$ 5.000 - R$ 7.999';
-  } else if (score >= 40) {
+  } else if (score >= 45) {
     tier = 'TIER B';
     salaryRange = 'R$ 3.000 - R$ 4.999';
-  } else if (score >= 20) {
+  } else if (score >= 25) {
     tier = 'TIER C';
     salaryRange = 'R$ 1.500 - R$ 2.999';
   } else {
